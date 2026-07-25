@@ -35,12 +35,8 @@ describe("scrollmap-jupyter-repl", () => {
   }
 
   describe("activation", () => {
-    it("activates and observes the threshold setting", () => {
+    it("activates", () => {
       expect(atom.packages.isPackageActive("scrollmap-jupyter-repl")).toBe(true);
-      expect(mainModule.threshold).toBe(0);
-
-      atom.config.set("scrollmap-jupyter-repl.threshold", 6);
-      expect(mainModule.threshold).toBe(6);
     });
   });
 
@@ -110,6 +106,7 @@ describe("scrollmap-jupyter-repl", () => {
 
     it("describes the jupyter-repl layer", () => {
       expect(provider.name).toBe("jupyter-repl");
+      expect(provider.threshold).toBe("scrollmap-jupyter-repl.threshold");
       expect(typeof provider.initialize).toBe("function");
       expect(typeof provider.getItems).toBe("function");
     });
@@ -127,28 +124,11 @@ describe("scrollmap-jupyter-repl", () => {
       disposable.dispose();
     });
 
-    it("re-runs the layer when the threshold changes", () => {
-      const layer = createLayer(editor);
-      provider.initialize(layer);
-
-      atom.config.set("scrollmap-jupyter-repl.threshold", 3);
-      expect(layer.update).toHaveBeenCalled();
-      layer.disposables.dispose();
-    });
-
     it("maps breakpoints to marker rows", () => {
       const layer = createLayer(editor);
       layer.cache.set("data", [new Point(2, 0), new Point(12, 0)]);
 
       expect(provider.getItems(layer)).toEqual([{ row: 2 }, { row: 12 }]);
-    });
-
-    it("hides all markers when the threshold is exceeded", () => {
-      atom.config.set("scrollmap-jupyter-repl.threshold", 1);
-      const layer = createLayer(editor);
-      layer.cache.set("data", [new Point(2, 0), new Point(12, 0)]);
-
-      expect(provider.getItems(layer)).toEqual([]);
     });
 
     it("returns no items without cached data", () => {
