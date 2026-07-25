@@ -23,12 +23,15 @@ describe("scrollmap-jove-repl", () => {
   }
 
   function createLayer(layerEditor) {
-    return {
+    const layer = {
       editor: layerEditor,
       cache: new Map(),
       disposables: new CompositeDisposable(),
       update: jasmine.createSpy("update"),
     };
+    // Register through the provider contract, exactly like the scrollmap hub.
+    mainModule.provideScrollmap().initialize(layer);
+    return layer;
   }
 
   describe("activation", () => {
@@ -59,7 +62,6 @@ describe("scrollmap-jove-repl", () => {
     it("seeds existing jove-repl layers on consumption", () => {
       const points = [new Point(4, 0)];
       const layer = createLayer(editor);
-      editor.scrollmap = { layers: new Map([["jove-repl", layer]]) };
 
       const service = createJoveService(new Map([[editor, points]]));
       const disposable = mainModule.consumeJoveService(service);
@@ -67,13 +69,12 @@ describe("scrollmap-jove-repl", () => {
       expect(layer.cache.get("data")).toEqual(points);
       expect(layer.update).toHaveBeenCalled();
 
-      delete editor.scrollmap;
+      layer.disposables.dispose();
       disposable.dispose();
     });
 
     it("pushes fresh breakpoints into the layer on service updates", () => {
       const layer = createLayer(editor);
-      editor.scrollmap = { layers: new Map([["jove-repl", layer]]) };
 
       const service = createJoveService(new Map());
       const disposable = mainModule.consumeJoveService(service);
@@ -85,7 +86,7 @@ describe("scrollmap-jove-repl", () => {
       expect(layer.cache.get("data")).toEqual(breakpoints);
       expect(layer.update).toHaveBeenCalled();
 
-      delete editor.scrollmap;
+      layer.disposables.dispose();
       disposable.dispose();
     });
 
