@@ -1,14 +1,31 @@
-# scrollmap-hydrogen
+# scrollmap-jove-repl
 
-Show cell markers on the scrollbar.
+Show cell markers on the scrollbar. A layer package for [scrollmap](https://github.com/lumine-code/scrollmap) that renders the code-cell boundaries tracked by [jove-repl](https://github.com/lumine-code/jove-repl).
+
+## Features
+
+- **Cell markers**: shows jove-repl cell boundaries as scrollbar markers.
+- **Live updates**: follows cell-marker changes as the buffer is edited.
+- **Threshold**: optionally hide all markers when the cell count gets too large.
 
 ## Installation
 
-To install `scrollmap-hydrogen` search for [scrollmap-hydrogen](https://web.pulsar-edit.dev/packages/scrollmap-hydrogen) in the Install pane of the Pulsar settings or run `ppm install scrollmap-hydrogen`. Alternatively, you can run `ppm install asiloisad/pulsar-scrollmap-hydrogen` to install a package directly from the GitHub repository.
+To install `scrollmap-jove-repl` search for _scrollmap-jove-repl_ in the Install pane of the Lumine settings or run `lumine --install lumine-code/scrollmap-jove-repl`.
 
-Layer package for [scrollmap](https://github.com/asiloisad/pulsar-scrollmap).
+## Customization
 
-Requires [hydrogen-next](https://github.com/asiloisad/pulsar-hydrogen-next).
+The style can be adjusted in the `styles.less` file, e.g. recolor the cell markers:
+
+```less
+.scrollmap .marker.marker-jove-repl {
+  background-color: var(--text-color-info);
+}
+```
+
+## Services
+
+- **jove.breakpoints** (`0.0.1`): consumed to read the cell boundary positions of an editor and follow their updates.
+- **scrollmap** (`1.0.0`): provided to register the `jove-repl` marker layer rendered on the editor scrollbar.
 
 ## Contributing
 
