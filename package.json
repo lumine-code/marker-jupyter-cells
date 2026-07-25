@@ -7,11 +7,12 @@
     "url": "https://github.com/lumine-code/scrollmap-jove-repl/issues"
   },
   "keywords": [
-    "scrollmap",
-    "jove-repl",
+    "overview-ruler",
+    "gutter",
+    "annotation",
+    "decoration",
     "jupyter",
-    "breakpoint",
-    "marker"
+    "cell"
   ],
   "version": "1.0.0",
   "license": "MIT",
