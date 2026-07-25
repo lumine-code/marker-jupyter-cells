@@ -28,7 +28,7 @@
   "consumedServices": {
     "jove.breakpoints": {
       "versions": {
-        "0.0.1": "consumeJoveService"
+        "^1.0.0": "consumeJoveService"
       }
     }
   },

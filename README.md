@@ -24,7 +24,7 @@ The style can be adjusted in the `styles.less` file, e.g. recolor the cell marke
 
 ## Services
 
-- **jove.breakpoints** (`0.0.1`): consumed to read the cell boundary positions of an editor and follow their updates.
+- **jove.breakpoints** (`^1.0.0`): consumed to read the cell boundary positions of an editor and follow their updates.
 - **scrollmap** (`1.0.0`): provided to register the `jove-repl` marker layer rendered on the editor scrollbar.
 
 ## Contributing
