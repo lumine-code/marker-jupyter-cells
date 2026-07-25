@@ -1,6 +1,6 @@
 const { CompositeDisposable, Emitter, Point } = require("atom");
 
-describe("scrollmap-jove-repl", () => {
+describe("scrollmap-jupyter-repl", () => {
   let workspaceElement, editor, mainModule;
 
   beforeEach(async () => {
@@ -8,11 +8,11 @@ describe("scrollmap-jove-repl", () => {
     jasmine.attachToDOM(workspaceElement);
     editor = await atom.workspace.open();
     editor.setText(Array(30).fill("lorem ipsum").join("\n"));
-    const pack = await atom.packages.activatePackage("scrollmap-jove-repl");
+    const pack = await atom.packages.activatePackage("scrollmap-jupyter-repl");
     mainModule = pack.mainModule;
   });
 
-  function createJoveService(breakpointsByEditor) {
+  function createJupyterService(breakpointsByEditor) {
     const emitter = new Emitter();
     return {
       emitter,
@@ -36,35 +36,35 @@ describe("scrollmap-jove-repl", () => {
 
   describe("activation", () => {
     it("activates and observes the threshold setting", () => {
-      expect(atom.packages.isPackageActive("scrollmap-jove-repl")).toBe(true);
+      expect(atom.packages.isPackageActive("scrollmap-jupyter-repl")).toBe(true);
       expect(mainModule.threshold).toBe(0);
 
-      atom.config.set("scrollmap-jove-repl.threshold", 6);
+      atom.config.set("scrollmap-jupyter-repl.threshold", 6);
       expect(mainModule.threshold).toBe(6);
     });
   });
 
-  describe("jove.breakpoints service consumer", () => {
+  describe("jupyter.breakpoints service consumer", () => {
     it("returns no breakpoints when no service is consumed", () => {
       expect(mainModule.breakpoints(editor)).toEqual([]);
     });
 
     it("reads initial breakpoints from the consumed service", () => {
       const points = [new Point(2, 0), new Point(10, 0)];
-      const service = createJoveService(new Map([[editor, points]]));
-      const disposable = mainModule.consumeJoveService(service);
+      const service = createJupyterService(new Map([[editor, points]]));
+      const disposable = mainModule.consumeJupyterService(service);
 
       expect(mainModule.breakpoints(editor)).toEqual(points);
 
       disposable.dispose();
     });
 
-    it("seeds existing jove-repl layers on consumption", () => {
+    it("seeds existing jupyter-repl layers on consumption", () => {
       const points = [new Point(4, 0)];
       const layer = createLayer(editor);
 
-      const service = createJoveService(new Map([[editor, points]]));
-      const disposable = mainModule.consumeJoveService(service);
+      const service = createJupyterService(new Map([[editor, points]]));
+      const disposable = mainModule.consumeJupyterService(service);
 
       expect(layer.cache.get("data")).toEqual(points);
       expect(layer.update).toHaveBeenCalled();
@@ -76,8 +76,8 @@ describe("scrollmap-jove-repl", () => {
     it("pushes fresh breakpoints into the layer on service updates", () => {
       const layer = createLayer(editor);
 
-      const service = createJoveService(new Map());
-      const disposable = mainModule.consumeJoveService(service);
+      const service = createJupyterService(new Map());
+      const disposable = mainModule.consumeJupyterService(service);
       layer.update.calls.reset();
 
       const breakpoints = [new Point(7, 0), new Point(15, 0)];
@@ -91,12 +91,12 @@ describe("scrollmap-jove-repl", () => {
     });
 
     it("detaches the service on disposal", () => {
-      const service = createJoveService(new Map([[editor, [new Point(1, 0)]]]));
-      const disposable = mainModule.consumeJoveService(service);
-      expect(mainModule.joveService).toBe(service);
+      const service = createJupyterService(new Map([[editor, [new Point(1, 0)]]]));
+      const disposable = mainModule.consumeJupyterService(service);
+      expect(mainModule.jupyterService).toBe(service);
 
       disposable.dispose();
-      expect(mainModule.joveService).toBe(null);
+      expect(mainModule.jupyterService).toBe(null);
       expect(mainModule.breakpoints(editor)).toEqual([]);
     });
   });
@@ -108,16 +108,16 @@ describe("scrollmap-jove-repl", () => {
       provider = mainModule.provideScrollmap();
     });
 
-    it("describes the jove-repl layer", () => {
-      expect(provider.name).toBe("jove-repl");
+    it("describes the jupyter-repl layer", () => {
+      expect(provider.name).toBe("jupyter-repl");
       expect(typeof provider.initialize).toBe("function");
       expect(typeof provider.getItems).toBe("function");
     });
 
     it("seeds the cache with current breakpoints on initialize", () => {
       const points = [new Point(3, 0)];
-      const service = createJoveService(new Map([[editor, points]]));
-      const disposable = mainModule.consumeJoveService(service);
+      const service = createJupyterService(new Map([[editor, points]]));
+      const disposable = mainModule.consumeJupyterService(service);
 
       const layer = createLayer(editor);
       provider.initialize(layer);
@@ -131,7 +131,7 @@ describe("scrollmap-jove-repl", () => {
       const layer = createLayer(editor);
       provider.initialize(layer);
 
-      atom.config.set("scrollmap-jove-repl.threshold", 3);
+      atom.config.set("scrollmap-jupyter-repl.threshold", 3);
       expect(layer.update).toHaveBeenCalled();
       layer.disposables.dispose();
     });
@@ -144,7 +144,7 @@ describe("scrollmap-jove-repl", () => {
     });
 
     it("hides all markers when the threshold is exceeded", () => {
-      atom.config.set("scrollmap-jove-repl.threshold", 1);
+      atom.config.set("scrollmap-jupyter-repl.threshold", 1);
       const layer = createLayer(editor);
       layer.cache.set("data", [new Point(2, 0), new Point(12, 0)]);
 
