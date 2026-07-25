@@ -1,7 +1,7 @@
 {
   "name": "scrollmap-jove-repl",
   "author": "lumine-code",
-  "description": "Show cell markers on the scrollbar",
+  "description": "Show cell markers on the scrollbar.",
   "repository": "https://github.com/lumine-code/scrollmap-jove-repl",
   "bugs": {
     "url": "https://github.com/lumine-code/scrollmap-jove-repl/issues"

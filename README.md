@@ -1,6 +1,8 @@
 # scrollmap-jove-repl
 
-Show cell markers on the scrollbar. A layer package for [scrollmap](https://github.com/lumine-code/scrollmap) that renders the code-cell boundaries tracked by [jove-repl](https://github.com/lumine-code/jove-repl).
+Show cell markers on the scrollbar.
+
+A layer package for [scrollmap](https://github.com/lumine-code/scrollmap) that renders the code-cell boundaries tracked by [jove-repl](https://github.com/lumine-code/jove-repl).
 
 ## Features
 
