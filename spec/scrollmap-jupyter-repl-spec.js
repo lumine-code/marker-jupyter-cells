@@ -48,7 +48,7 @@ describe("scrollmap-jupyter-repl", () => {
     it("reads initial breakpoints from the consumed service", () => {
       const points = [new Point(2, 0), new Point(10, 0)];
       const service = createJupyterService(new Map([[editor, points]]));
-      const disposable = mainModule.consumeJupyterService(service);
+      const disposable = mainModule.consumeJupyterBreakpoints(service);
 
       expect(mainModule.breakpoints(editor)).toEqual(points);
 
@@ -60,7 +60,7 @@ describe("scrollmap-jupyter-repl", () => {
       const layer = createLayer(editor);
 
       const service = createJupyterService(new Map([[editor, points]]));
-      const disposable = mainModule.consumeJupyterService(service);
+      const disposable = mainModule.consumeJupyterBreakpoints(service);
 
       expect(layer.cache.get("data")).toEqual(points);
       expect(layer.update).toHaveBeenCalled();
@@ -73,7 +73,7 @@ describe("scrollmap-jupyter-repl", () => {
       const layer = createLayer(editor);
 
       const service = createJupyterService(new Map());
-      const disposable = mainModule.consumeJupyterService(service);
+      const disposable = mainModule.consumeJupyterBreakpoints(service);
       layer.update.calls.reset();
 
       const breakpoints = [new Point(7, 0), new Point(15, 0)];
@@ -88,7 +88,7 @@ describe("scrollmap-jupyter-repl", () => {
 
     it("detaches the service on disposal", () => {
       const service = createJupyterService(new Map([[editor, [new Point(1, 0)]]]));
-      const disposable = mainModule.consumeJupyterService(service);
+      const disposable = mainModule.consumeJupyterBreakpoints(service);
       expect(mainModule.jupyterService).toBe(service);
 
       disposable.dispose();
@@ -114,7 +114,7 @@ describe("scrollmap-jupyter-repl", () => {
     it("seeds the cache with current breakpoints on initialize", () => {
       const points = [new Point(3, 0)];
       const service = createJupyterService(new Map([[editor, points]]));
-      const disposable = mainModule.consumeJupyterService(service);
+      const disposable = mainModule.consumeJupyterBreakpoints(service);
 
       const layer = createLayer(editor);
       provider.initialize(layer);

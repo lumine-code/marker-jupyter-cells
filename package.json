@@ -29,7 +29,7 @@
   "consumedServices": {
     "jupyter.breakpoints": {
       "versions": {
-        "^1.0.0": "consumeJupyterService"
+        "^1.0.0": "consumeJupyterBreakpoints"
       }
     }
   },
