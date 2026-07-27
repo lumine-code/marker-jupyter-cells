@@ -1,25 +1,25 @@
-# scrollmap-jupyter-repl
+# marker-jupyter-repl
 
-Show cell markers on the scrollbar.
+Show cell markers on the scrollbar and minimap.
 
-A layer package for [scrollmap](https://github.com/lumine-code/scrollmap) that renders the code-cell boundaries tracked by [jupyter-repl](https://github.com/lumine-code/jupyter-repl).
+A marker layer for [scrollmap](https://github.com/lumine-code/scrollmap) and [minimap](https://github.com/lumine-code/minimap) that renders the code-cell boundaries tracked by [jupyter-repl](https://github.com/lumine-code/jupyter-repl).
 
 ## Features
 
-- **Cell markers**: shows jupyter-repl cell boundaries as scrollbar markers.
+- **Cell markers**: shows jupyter-repl cell boundaries on every overview map.
 - **Live updates**: follows cell-marker changes as the buffer is edited.
 - **Threshold**: optionally hide all markers when the cell count gets too large.
 
 ## Installation
 
-To install `scrollmap-jupyter-repl` search for _scrollmap-jupyter-repl_ in the Install pane of the Lumine settings or run `lumine --install lumine-code/scrollmap-jupyter-repl`.
+To install `marker-jupyter-repl` search for _marker-jupyter-repl_ in the Install pane of the Lumine settings or run `lumine --install lumine-code/marker-jupyter-repl`.
 
 ## Customization
 
 The style can be adjusted in the `styles.less` file, e.g. recolor the cell markers:
 
 ```less
-.scrollmap .marker.marker-jupyter-repl {
+.marker.marker-jupyter-repl {
   background-color: var(--text-color-info);
 }
 ```
@@ -27,7 +27,7 @@ The style can be adjusted in the `styles.less` file, e.g. recolor the cell marke
 ## Services
 
 - **[jupyter.breakpoints](https://lumine-code.github.io/docs.html#services/jupyter.breakpoints)** (`^1.0.0`): consumed to read the cell boundary positions of an editor and follow their updates.
-- **[scrollmap.layer](https://lumine-code.github.io/docs.html#services/scrollmap.layer)** (`1.0.0`): provided to register the `jupyter-repl` marker layer rendered on the editor scrollbar.
+- **[marker.layer](https://lumine-code.github.io/docs.html#services/marker.layer)** (`1.0.0`): provided to register the `jupyter-repl` marker layer drawn by the overview maps.
 
 ## Contributing
 

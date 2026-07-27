@@ -1,6 +1,6 @@
 const { CompositeDisposable, Emitter, Point } = require("atom");
 
-describe("scrollmap-jupyter-repl", () => {
+describe("marker-jupyter-repl", () => {
   let workspaceElement, editor, mainModule;
 
   beforeEach(async () => {
@@ -8,7 +8,7 @@ describe("scrollmap-jupyter-repl", () => {
     jasmine.attachToDOM(workspaceElement);
     editor = await atom.workspace.open();
     editor.setText(Array(30).fill("lorem ipsum").join("\n"));
-    const pack = await atom.packages.activatePackage("scrollmap-jupyter-repl");
+    const pack = await atom.packages.activatePackage("marker-jupyter-repl");
     mainModule = pack.mainModule;
   });
 
@@ -22,21 +22,23 @@ describe("scrollmap-jupyter-repl", () => {
     };
   }
 
-  function createLayer(layerEditor) {
+  // The data half of a host's layer, which is the only half a provider sees.
+  function createLayer(provider, layerEditor = editor) {
     const layer = {
       editor: layerEditor,
+      props: provider,
       cache: new Map(),
+      items: [],
       disposables: new CompositeDisposable(),
       update: jasmine.createSpy("update"),
     };
-    // Register through the provider contract, exactly like the scrollmap hub.
-    mainModule.provideScrollmapLayer().initialize(layer);
+    provider.initialize(layer);
     return layer;
   }
 
   describe("activation", () => {
     it("activates", () => {
-      expect(atom.packages.isPackageActive("scrollmap-jupyter-repl")).toBe(true);
+      expect(atom.packages.isPackageActive("marker-jupyter-repl")).toBe(true);
     });
   });
 
@@ -57,7 +59,7 @@ describe("scrollmap-jupyter-repl", () => {
 
     it("seeds existing jupyter-repl layers on consumption", () => {
       const points = [new Point(4, 0)];
-      const layer = createLayer(editor);
+      const layer = createLayer(mainModule.provideMarkerLayer());
 
       const service = createJupyterService(new Map([[editor, points]]));
       const disposable = mainModule.consumeJupyterBreakpoints(service);
@@ -70,7 +72,7 @@ describe("scrollmap-jupyter-repl", () => {
     });
 
     it("pushes fresh breakpoints into the layer on service updates", () => {
-      const layer = createLayer(editor);
+      const layer = createLayer(mainModule.provideMarkerLayer());
 
       const service = createJupyterService(new Map());
       const disposable = mainModule.consumeJupyterBreakpoints(service);
@@ -97,16 +99,16 @@ describe("scrollmap-jupyter-repl", () => {
     });
   });
 
-  describe("scrollmap service provider", () => {
+  describe("marker.layer service provider", () => {
     let provider;
 
     beforeEach(() => {
-      provider = mainModule.provideScrollmapLayer();
+      provider = mainModule.provideMarkerLayer();
     });
 
     it("describes the jupyter-repl layer", () => {
       expect(provider.name).toBe("jupyter-repl");
-      expect(provider.threshold).toBe("scrollmap-jupyter-repl.threshold");
+      expect(provider.threshold).toBe("marker-jupyter-repl.threshold");
       expect(typeof provider.initialize).toBe("function");
       expect(typeof provider.getItems).toBe("function");
     });
@@ -116,8 +118,7 @@ describe("scrollmap-jupyter-repl", () => {
       const service = createJupyterService(new Map([[editor, points]]));
       const disposable = mainModule.consumeJupyterBreakpoints(service);
 
-      const layer = createLayer(editor);
-      provider.initialize(layer);
+      const layer = createLayer(provider);
       expect(layer.cache.get("data")).toEqual(points);
 
       layer.disposables.dispose();
@@ -125,15 +126,84 @@ describe("scrollmap-jupyter-repl", () => {
     });
 
     it("maps breakpoints to marker rows", () => {
-      const layer = createLayer(editor);
+      const layer = createLayer(provider);
       layer.cache.set("data", [new Point(2, 0), new Point(12, 0)]);
 
       expect(provider.getItems(layer)).toEqual([{ row: 2 }, { row: 12 }]);
     });
 
     it("returns no items without cached data", () => {
-      const layer = createLayer(editor);
+      const layer = createLayer(provider);
       expect(provider.getItems(layer)).toEqual([]);
+    });
+  });
+
+  // Every renderer builds its own layer from the descriptor, so an editor has as
+  // many layers as there are maps drawing it.
+  describe("with two renderers on one editor", () => {
+    let provider, first, second;
+
+    beforeEach(() => {
+      provider = mainModule.provideMarkerLayer();
+      first = createLayer(provider);
+      second = createLayer(provider);
+    });
+
+    afterEach(() => {
+      first.disposables.dispose();
+      second.disposables.dispose();
+    });
+
+    it("pushes service updates to both layers", () => {
+      const service = createJupyterService(new Map());
+      const disposable = mainModule.consumeJupyterBreakpoints(service);
+      first.update.calls.reset();
+      second.update.calls.reset();
+
+      const breakpoints = [new Point(5, 0), new Point(20, 0)];
+      service.emitter.emit("did-update", { editor, breakpoints });
+
+      expect(first.cache.get("data")).toEqual(breakpoints);
+      expect(second.cache.get("data")).toEqual(breakpoints);
+      expect(first.update).toHaveBeenCalled();
+      expect(second.update).toHaveBeenCalled();
+
+      disposable.dispose();
+    });
+
+    it("scans an editor once however many layers attach to it", async () => {
+      const other = await atom.workspace.open();
+      const service = createJupyterService(new Map([[other, [new Point(0, 0)]]]));
+      spyOn(service, "initBreakpoints").and.callThrough();
+      const disposable = mainModule.consumeJupyterBreakpoints(service);
+      // Consumption re-reads the editors already attached; the count under test
+      // is the one the two `other` layers below add.
+      service.initBreakpoints.calls.reset();
+
+      const third = createLayer(provider, other);
+      const fourth = createLayer(provider, other);
+
+      expect(service.initBreakpoints.calls.count()).toBe(1);
+      expect(fourth.cache.get("data")).toEqual(third.cache.get("data"));
+
+      third.disposables.dispose();
+      fourth.disposables.dispose();
+      disposable.dispose();
+    });
+
+    it("keeps updating the surviving layer after the other detaches", () => {
+      const service = createJupyterService(new Map());
+      const disposable = mainModule.consumeJupyterBreakpoints(service);
+      first.disposables.dispose();
+      second.update.calls.reset();
+
+      const breakpoints = [new Point(9, 0)];
+      service.emitter.emit("did-update", { editor, breakpoints });
+
+      expect(second.cache.get("data")).toEqual(breakpoints);
+      expect(second.update).toHaveBeenCalled();
+
+      disposable.dispose();
     });
   });
 });

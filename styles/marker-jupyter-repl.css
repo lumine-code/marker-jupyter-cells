@@ -1,4 +1,4 @@
-.scrollmap .marker.marker-jupyter-repl {
+.marker.marker-jupyter-repl {
   z-index: 13;
   background-color: var(--ui-site-color-4);
 }
