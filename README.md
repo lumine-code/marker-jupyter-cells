@@ -26,8 +26,8 @@ The style can be adjusted in the `styles.less` file, e.g. recolor the cell marke
 
 ## Services
 
-- **[jupyter.breakpoints](https://lumine-code.github.io/docs.html#services/jupyter.breakpoints)** (`^1.0.0`): consumed to read the cell boundary positions of an editor and follow their updates.
-- **[marker.layer](https://lumine-code.github.io/docs.html#services/marker.layer)** (`1.0.0`): provided to register the `jupyter-repl` marker layer drawn by the overview maps.
+- **jupyter.breakpoints** (`^1.0.0`): consumed to read the cell boundary positions of an editor and follow their updates.
+- **marker.layer** (`1.0.0`): provided to register the `jupyter-repl` marker layer drawn by the overview maps.
 
 ## Contributing
 
