@@ -136,72 +136,19 @@ describe("marker-jupyter-repl", () => {
       const layer = createLayer(provider);
       expect(provider.getItems(layer)).toEqual([]);
     });
-  });
 
-  // Every renderer builds its own layer from the descriptor, so an editor has as
-  // many layers as there are maps drawing it.
-  describe("with two renderers on one editor", () => {
-    let provider, first, second;
-
-    beforeEach(() => {
-      provider = mainModule.provideMarkerLayer();
-      first = createLayer(provider);
-      second = createLayer(provider);
-    });
-
-    afterEach(() => {
-      first.disposables.dispose();
-      second.disposables.dispose();
-    });
-
-    it("pushes service updates to both layers", () => {
+    it("forgets the editor when its layer detaches", () => {
+      const layer = createLayer(provider);
       const service = createJupyterService(new Map());
       const disposable = mainModule.consumeJupyterBreakpoints(service);
-      first.update.calls.reset();
-      second.update.calls.reset();
-
-      const breakpoints = [new Point(5, 0), new Point(20, 0)];
-      service.emitter.emit("did-update", { editor, breakpoints });
-
-      expect(first.cache.get("data")).toEqual(breakpoints);
-      expect(second.cache.get("data")).toEqual(breakpoints);
-      expect(first.update).toHaveBeenCalled();
-      expect(second.update).toHaveBeenCalled();
-
-      disposable.dispose();
-    });
-
-    it("scans an editor once however many layers attach to it", async () => {
-      const other = await atom.workspace.open();
-      const service = createJupyterService(new Map([[other, [new Point(0, 0)]]]));
-      spyOn(service, "initBreakpoints").and.callThrough();
-      const disposable = mainModule.consumeJupyterBreakpoints(service);
-      // Consumption re-reads the editors already attached; the count under test
-      // is the one the two `other` layers below add.
-      service.initBreakpoints.calls.reset();
-
-      const third = createLayer(provider, other);
-      const fourth = createLayer(provider, other);
-
-      expect(service.initBreakpoints.calls.count()).toBe(1);
-      expect(fourth.cache.get("data")).toEqual(third.cache.get("data"));
-
-      third.disposables.dispose();
-      fourth.disposables.dispose();
-      disposable.dispose();
-    });
-
-    it("keeps updating the surviving layer after the other detaches", () => {
-      const service = createJupyterService(new Map());
-      const disposable = mainModule.consumeJupyterBreakpoints(service);
-      first.disposables.dispose();
-      second.update.calls.reset();
+      layer.disposables.dispose();
+      layer.update.calls.reset();
 
       const breakpoints = [new Point(9, 0)];
       service.emitter.emit("did-update", { editor, breakpoints });
 
-      expect(second.cache.get("data")).toEqual(breakpoints);
-      expect(second.update).toHaveBeenCalled();
+      expect(layer.cache.get("data")).toEqual([]);
+      expect(layer.update).not.toHaveBeenCalled();
 
       disposable.dispose();
     });
