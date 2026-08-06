@@ -16,9 +16,9 @@ To install `marker-jupyter-repl` search for _marker-jupyter-repl_ in the Install
 
 ## Customization
 
-The style can be adjusted in the `styles.less` file, e.g. recolor the cell markers:
+The style can be adjusted in the `styles.css` file, e.g. recolor the cell markers:
 
-```less
+```css
 .marker.marker-jupyter-repl {
   background-color: var(--text-color-info);
 }
