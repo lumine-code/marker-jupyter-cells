@@ -1,14 +1,14 @@
-const { CompositeDisposable, Emitter, Point } = require("atom");
+const { CompositeDisposable, Emitter, Point } = require("lumine");
 
 describe("marker-jupyter-repl", () => {
   let workspaceElement, editor, mainModule;
 
   beforeEach(async () => {
-    workspaceElement = atom.views.getView(atom.workspace);
+    workspaceElement = lumine.views.getView(lumine.workspace);
     jasmine.attachToDOM(workspaceElement);
-    editor = await atom.workspace.open();
+    editor = await lumine.workspace.open();
     editor.setText(Array(30).fill("lorem ipsum").join("\n"));
-    const pack = await atom.packages.activatePackage("marker-jupyter-repl");
+    const pack = await lumine.packages.activatePackage("marker-jupyter-repl");
     mainModule = pack.mainModule;
   });
 
@@ -38,7 +38,7 @@ describe("marker-jupyter-repl", () => {
 
   describe("activation", () => {
     it("activates", () => {
-      expect(atom.packages.isPackageActive("marker-jupyter-repl")).toBe(true);
+      expect(lumine.packages.isPackageActive("marker-jupyter-repl")).toBe(true);
     });
   });
 
