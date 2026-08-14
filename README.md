@@ -12,7 +12,7 @@ A marker layer for [scrollmap](https://github.com/lumine-code/scrollmap) and [mi
 
 ## Installation
 
-To install `marker-jupyter-repl` search for _marker-jupyter-repl_ in the Install pane of the Lumine settings or run `lumine --install lumine-code/marker-jupyter-repl`.
+To install `marker-jupyter-repl` search for it in the Install pane of the Lumine settings, or run the command `lumine --install lumine-code/marker-jupyter-repl`.
 
 ## Customization
 
@@ -26,8 +26,8 @@ The style can be adjusted in the `styles.css` file, e.g. recolor the cell marker
 
 ## Services
 
-- **jupyter.breakpoints** (`^1.0.0`): consumed to read the cell boundary positions of an editor and follow their updates.
-- **marker.layer** (`1.0.0`): provided to register the `jupyter-repl` marker layer drawn by the overview maps.
+- `jupyter.breakpoints`: consumed to read the cell boundary positions of an editor and follow their updates.
+- `marker.layer`: provided to register the `jupyter-repl` marker layer drawn by the overview maps.
 
 ## Contributing
 
