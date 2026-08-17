@@ -1,10 +1,10 @@
 {
-  "name": "marker-jupyter-repl",
+  "name": "marker-jupyter-cells",
   "author": "lumine-code",
   "description": "Show cell markers on the scrollbar and minimap.",
-  "repository": "https://github.com/lumine-code/marker-jupyter-repl",
+  "repository": "https://github.com/lumine-code/marker-jupyter-cells",
   "bugs": {
-    "url": "https://github.com/lumine-code/marker-jupyter-repl/issues"
+    "url": "https://github.com/lumine-code/marker-jupyter-cells/issues"
   },
   "keywords": [
     "overview-ruler",
@@ -13,8 +13,8 @@
     "decoration",
     "scrollmap",
     "minimap",
-    "cell",
-    "breakpoint"
+    "percent-format",
+    "boundary"
   ],
   "version": "1.0.0",
   "license": "MIT",
@@ -34,9 +34,9 @@
     "format:check": "prettier --check ."
   },
   "consumedServices": {
-    "jupyter.breakpoints": {
+    "jupyter.cells": {
       "versions": {
-        "^1.0.0": "consumeJupyterBreakpoints"
+        "^1.0.0": "consumeJupyterCells"
       }
     }
   },

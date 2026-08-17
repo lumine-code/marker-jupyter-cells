@@ -1,6 +1,6 @@
 const { CompositeDisposable, Emitter, Point } = require("lumine");
 
-describe("marker-jupyter-repl", () => {
+describe("marker-jupyter-cells", () => {
   let workspaceElement, editor, mainModule;
 
   beforeEach(async () => {
@@ -8,11 +8,11 @@ describe("marker-jupyter-repl", () => {
     jasmine.attachToDOM(workspaceElement);
     editor = await lumine.workspace.open();
     editor.setText(Array(30).fill("lorem ipsum").join("\n"));
-    const pack = await lumine.packages.activatePackage("marker-jupyter-repl");
+    const pack = await lumine.packages.activatePackage("marker-jupyter-cells");
     mainModule = pack.mainModule;
   });
 
-  function createJupyterService(breakpointsByEditor) {
+  function createCellsService(breakpointsByEditor) {
     const emitter = new Emitter();
     return {
       emitter,
@@ -38,31 +38,31 @@ describe("marker-jupyter-repl", () => {
 
   describe("activation", () => {
     it("activates", () => {
-      expect(lumine.packages.isPackageActive("marker-jupyter-repl")).toBe(true);
+      expect(lumine.packages.isPackageActive("marker-jupyter-cells")).toBe(true);
     });
   });
 
-  describe("jupyter.breakpoints service consumer", () => {
+  describe("jupyter.cells service consumer", () => {
     it("returns no breakpoints when no service is consumed", () => {
       expect(mainModule.breakpoints(editor)).toEqual([]);
     });
 
     it("reads initial breakpoints from the consumed service", () => {
       const points = [new Point(2, 0), new Point(10, 0)];
-      const service = createJupyterService(new Map([[editor, points]]));
-      const disposable = mainModule.consumeJupyterBreakpoints(service);
+      const service = createCellsService(new Map([[editor, points]]));
+      const disposable = mainModule.consumeJupyterCells(service);
 
       expect(mainModule.breakpoints(editor)).toEqual(points);
 
       disposable.dispose();
     });
 
-    it("seeds existing jupyter-repl layers on consumption", () => {
+    it("seeds existing jupyter-cells layers on consumption", () => {
       const points = [new Point(4, 0)];
       const layer = createLayer(mainModule.provideMarkerLayer());
 
-      const service = createJupyterService(new Map([[editor, points]]));
-      const disposable = mainModule.consumeJupyterBreakpoints(service);
+      const service = createCellsService(new Map([[editor, points]]));
+      const disposable = mainModule.consumeJupyterCells(service);
 
       expect(layer.cache.get("data")).toEqual(points);
       expect(layer.update).toHaveBeenCalled();
@@ -74,8 +74,8 @@ describe("marker-jupyter-repl", () => {
     it("pushes fresh breakpoints into the layer on service updates", () => {
       const layer = createLayer(mainModule.provideMarkerLayer());
 
-      const service = createJupyterService(new Map());
-      const disposable = mainModule.consumeJupyterBreakpoints(service);
+      const service = createCellsService(new Map());
+      const disposable = mainModule.consumeJupyterCells(service);
       layer.update.calls.reset();
 
       const breakpoints = [new Point(7, 0), new Point(15, 0)];
@@ -89,12 +89,12 @@ describe("marker-jupyter-repl", () => {
     });
 
     it("detaches the service on disposal", () => {
-      const service = createJupyterService(new Map([[editor, [new Point(1, 0)]]]));
-      const disposable = mainModule.consumeJupyterBreakpoints(service);
-      expect(mainModule.jupyterService).toBe(service);
+      const service = createCellsService(new Map([[editor, [new Point(1, 0)]]]));
+      const disposable = mainModule.consumeJupyterCells(service);
+      expect(mainModule.cellsService).toBe(service);
 
       disposable.dispose();
-      expect(mainModule.jupyterService).toBe(null);
+      expect(mainModule.cellsService).toBe(null);
       expect(mainModule.breakpoints(editor)).toEqual([]);
     });
   });
@@ -106,17 +106,17 @@ describe("marker-jupyter-repl", () => {
       provider = mainModule.provideMarkerLayer();
     });
 
-    it("describes the jupyter-repl layer", () => {
-      expect(provider.name).toBe("jupyter-repl");
-      expect(provider.threshold).toBe("marker-jupyter-repl.threshold");
+    it("describes the jupyter-cells layer", () => {
+      expect(provider.name).toBe("jupyter-cells");
+      expect(provider.threshold).toBe("marker-jupyter-cells.threshold");
       expect(typeof provider.initialize).toBe("function");
       expect(typeof provider.getItems).toBe("function");
     });
 
     it("seeds the cache with current breakpoints on initialize", () => {
       const points = [new Point(3, 0)];
-      const service = createJupyterService(new Map([[editor, points]]));
-      const disposable = mainModule.consumeJupyterBreakpoints(service);
+      const service = createCellsService(new Map([[editor, points]]));
+      const disposable = mainModule.consumeJupyterCells(service);
 
       const layer = createLayer(provider);
       expect(layer.cache.get("data")).toEqual(points);
@@ -139,8 +139,8 @@ describe("marker-jupyter-repl", () => {
 
     it("forgets the editor when its layer detaches", () => {
       const layer = createLayer(provider);
-      const service = createJupyterService(new Map());
-      const disposable = mainModule.consumeJupyterBreakpoints(service);
+      const service = createCellsService(new Map());
+      const disposable = mainModule.consumeJupyterCells(service);
       layer.disposables.dispose();
       layer.update.calls.reset();
 
