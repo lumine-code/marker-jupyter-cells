@@ -1,5 +1,8 @@
 # marker-jupyter-cells
 
+> [!WARNING]
+> **This package is deprecated.** Its marker layer now ships with [jupyter-cells](https://github.com/lumine-code/jupyter-cells) itself — the marker-* adapter packages were folded into their host packages, and this layer's settings moved to `jupyter-cells.marker.*`. This repository is archived and no longer maintained.
+
 Show cell markers on the scrollbar and minimap.
 
 A marker layer for [scrollmap](https://github.com/lumine-code/scrollmap) and [minimap](https://github.com/lumine-code/minimap) that renders the code-cell boundaries tracked by [jupyter-cells](https://github.com/lumine-code/jupyter-cells).
